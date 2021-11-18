@@ -20,10 +20,10 @@ pipeline {
                 echo "Tagging and pushing to ECR"
                 echo "build-${BUILD_ID}"
                 
-//                 sh """
-//                 git tag build-${BUILD_ID}
-//                 git push origin --tags
-//                 """
+                sh """
+                git tag build-${BUILD_ID}
+                git push origin --tags
+                """
                 
                 // TODO : IMPLEMENT PUSH TO ECR
             }
@@ -35,7 +35,10 @@ pipeline {
             }
             steps{
                 echo "Deploying docker container in dev env"
-                // TODO : IMPLEMENT DEPLOYING CONTAINER
+
+                sh "docker run -p -d 3000:8080 intern/springapp"
+                echo "App running on : http://localhost:3000"
+                
                 script{
                        env.RELEASE = input message: 'Should we promote to QA ?', ok: 'Continue',
                              parameters: [booleanParam(name: 'QA_DEPLOY')] 
@@ -55,7 +58,7 @@ pipeline {
             steps{
                 
                 echo "Deploying docker container in QS"
-                // TODO : APPROVAL STAGE TO PROMOTE TO QA
+                // TODO : IMPLEMENT QA DEPLOY
             }
         }
         
@@ -64,7 +67,11 @@ pipeline {
                 branch 'release/*'
             }
             steps{
-                echo "Cleaning dangling containers and images"
+                echo "Cleanup dangling/unused containers and images"
+                sh """
+                docker image prune -a -f
+                docker container prune -f
+                """
                 // TODO : IMPLEMENT CLEANUP
             }
         }
