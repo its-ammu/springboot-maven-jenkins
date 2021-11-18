@@ -39,8 +39,8 @@ pipeline {
                 sh "docker rm -f Springhello && echo 'Previous build removed' || echo 'No Previous build found'"
 
                 echo "Deploying new build ..."
-                
-                sh "docker run -p -d 3000:8080 intern/springapp --name Springhello"
+
+                sh "docker run -p -d 3000:8080 --name Springhello intern/springapp "
                 echo "App running on : http://localhost:3000"
                 
                 script{
