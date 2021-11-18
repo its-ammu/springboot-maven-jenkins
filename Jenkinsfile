@@ -36,7 +36,7 @@ pipeline {
             steps{
                 echo "Removing previous build ... "
 
-                sh "docker rm -f Springhello && echo 'Previous build removed' || echo 'No Previous build found'"
+                sh "docker rm -f Springhello && echo 'Previous build removed'"
 
                 echo "Deploying new build ..."
 
@@ -71,7 +71,7 @@ pipeline {
                 branch 'release/*'
             }
             steps{
-                echo "Cleanup dangling/unused containers and images"
+                echo "Cleaning dangling/unused containers and images"
 
                 sh """
                 docker image prune -a -f
