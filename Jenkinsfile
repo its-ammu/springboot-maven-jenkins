@@ -40,7 +40,7 @@ pipeline {
 
                 echo "Deploying new build ..."
 
-                sh "docker run -p -d 3000:8080 --name Springhello intern/springapp "
+                sh "docker run -d -p 3000:8080 --name Springhello intern/springapp "
                 echo "App running on : http://localhost:3000"
                 
                 script{
