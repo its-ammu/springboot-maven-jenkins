@@ -34,9 +34,13 @@ pipeline {
                 branch 'release/*'
             }
             steps{
-                echo "Deploying docker container in dev env"
+                echo "Removing previous build ... "
 
-                sh "docker run -p -d 3000:8080 intern/springapp"
+                sh "docker rm -f Springhello && echo 'Previous build removed' || echo 'No Previous build found'"
+
+                echo "Deploying new build ..."
+                
+                sh "docker run -p -d 3000:8080 intern/springapp --name Springhello"
                 echo "App running on : http://localhost:3000"
                 
                 script{
@@ -68,6 +72,7 @@ pipeline {
             }
             steps{
                 echo "Cleanup dangling/unused containers and images"
+
                 sh """
                 docker image prune -a -f
                 docker container prune -f
