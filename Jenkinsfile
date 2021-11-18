@@ -77,7 +77,7 @@ pipeline {
                 docker image prune -a -f
                 docker container prune -f
                 """
-                // TODO : IMPLEMENT CLEANUP
+                
             }
         }
     }
