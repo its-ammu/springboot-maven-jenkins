@@ -17,4 +17,6 @@ Java / Maven / Spring Boot Hello world application deployed into CI/CD Using Jen
   - The `Jenkinsfile` will execute the `BUILD`, `DEV_DEPLOY`, `QA_DEPLOY`(Will ask approval) and `CLEANUP` stages accordingly.
   
 ## Testing the app
-The app will be running on : http://localhost:3000 
+The app will be running on http://localhost:8080 or in the specified port while using docker.
+
+While using jenkins it runs on http://localhost:3000.
