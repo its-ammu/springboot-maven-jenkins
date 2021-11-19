@@ -50,7 +50,7 @@ pipeline {
     }
     post {
         success {
-           build job: 'Maven deploy', parameters: [string(name: 'BUILD', value: ${BUILD_ID})]
+           build job: 'Maven deploy', parameters: [string(name: 'BUILD', value: "$BUILD_ID")]
         }
     }
 }
