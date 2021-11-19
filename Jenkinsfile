@@ -4,7 +4,6 @@ pipeline {
         maven 'maven'
         dockerTool 'docker'
     }
-    
     stages{
        
         stage('BUILD'){
@@ -12,78 +11,46 @@ pipeline {
                 branch 'release/*'
             }
             steps{
-                echo "Building... "
+                echo "BUILDING THE IMAGE... "
                 
                 sh "mvn clean package"
-                sh "docker build -t intern/springapp ."
+                sh "docker build -t intern/springapp:build-${BUILD_ID} ."
                 
-                echo "Tagging and pushing to ECR"
-                echo "build-${BUILD_ID}"
+            }
+        }
+        stage('TAG'){
+            when {
+                branch 'release/*'
+            }
+            steps{
+                echo "TAGGING GIT REPO..."
                 
                 sh """
                 git tag build-${BUILD_ID}
                 git push origin --tags
                 """
-                
-                sh """
-                aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/i9s5w5q2
-                docker tag intern/springapp:latest public.ecr.aws/i9s5w5q2/jenkins-maven:build-${BUILD_ID}
-                docker push public.ecr.aws/i9s5w5q2/jenkins-maven:build-${BUILD_ID}
-                """
-                
+
             }
         }
-        
-        stage('DEV_DEPLOY'){
+        stage('PUSH'){
             when {
                 branch 'release/*'
             }
             steps{
-                echo "Removing previous build ... "
-
-                sh "docker rm -f Springhello && echo 'Previous build removed'"
-
-                echo "Deploying new build ..."
-
-                sh "docker run -d -p 3000:8080 --name Springhello intern/springapp "
-                echo "App running on : http://localhost:3000"
-                
-                script{
-                       env.RELEASE = input message: 'Should we promote to QA ?', ok: 'Continue',
-                             parameters: [booleanParam(name: 'QA_DEPLOY')] 
+                echo "PUSHING THE IMAGE TO REPO ..."
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                    sh """
+                    echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin 
+                    docker tag intern/springapp:build-${BUILD_ID} ${USERNAME}/jenkins-maven:build-${BUILD_ID}
+                    docker push ${USERNAME}/jenkins-maven:build-${BUILD_ID}
+                    """
                 }
-                
             }
         }
-        
-        stage('QA_DEPLOY'){
-             when {
-                branch 'release/*' 
-                 expression{
-                     return env.RELEASE
-                 }
-            }
-       
-            steps{
-                
-                echo "Deploying docker container in QS"
-                // TODO : IMPLEMENT QA DEPLOY
-            }
-        }
-        
-        stage('CLEANUP'){
-             when {
-                branch 'release/*'
-            }
-            steps{
-                echo "Cleaning dangling/unused containers and images"
-
-                sh """
-                docker image prune -a -f
-                docker container prune -f
-                """
-                
-            }
+    }
+    post {
+        success {
+           build job: 'Maven deploy', parameters: [string(name: 'BUILD', value: "$BUILD_ID")]
         }
     }
 }
