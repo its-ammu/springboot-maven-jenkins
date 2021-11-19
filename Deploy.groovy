@@ -13,6 +13,7 @@ pipeline{
                 echo "Removing previous build ... "
 
                 sh "docker rm -f Springhello-DEV && echo 'Previous build removed' || echo 'No previous build'"
+                sh "docker rm -f Springhello-QA && echo 'Previous build removed' || echo 'No previous build'"
 
                 echo "Deploying new build to DEV..."
 
