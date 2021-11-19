@@ -40,7 +40,7 @@ pipeline {
                 echo "PUSHING THE IMAGE TO REPO ..."
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                     sh """
-                    docker login --username ${USERNAME} --password ${PASSWORD}
+                    echo ${PASSWORD} | docker login --username ${USERNAME} --password-stdin 
                     docker tag intern/springapp:build-${BUILD_ID} ${USERNAME}/jenkins-maven:build-${BUILD_ID}
                     docker push ${USERNAME}/jenkins-maven:build-${BUILD_ID}
                     """
