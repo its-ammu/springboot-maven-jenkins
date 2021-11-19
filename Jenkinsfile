@@ -25,7 +25,12 @@ pipeline {
                 git push origin --tags
                 """
                 
-                // TODO : IMPLEMENT PUSH TO ECR
+                sh """
+                aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/i9s5w5q2
+                docker tag intern/springapp:latest public.ecr.aws/i9s5w5q2/jenkins-maven:build-${BUILD_ID}
+                docker push public.ecr.aws/i9s5w5q2/jenkins-maven:build-${BUILD_ID}
+                """
+                
             }
         }
         
